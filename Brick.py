@@ -6,6 +6,8 @@ ball = Circle(20,180,10,fill='white')
 # setting ball speed
 ball.dx = 7
 ball.dy = 7
+ball.dxabs = 7
+ball.dyabs = 7
 # creating boundries
 bottom = Rect(0,400,400,1)
 top = Rect(0,0,400,1)
@@ -31,14 +33,23 @@ def gameEnd(state):
 def resetBall():
     ball.centerX = 20
     ball.centerY = 180
-    ball.dx = 5 + (level.value *2)
-    ball.dy = 5 + (level.value *2)
+    ball.dx = ball.dxabs
+    ball.dy = ball.dxabs
 # makes a new row of bricks
 def nextLevel():
-    level.value += 1
-    lives.value += 1
-    makeRow(level.value)
-    resetBall()
+    if(level.value < 5):
+        level.value += 1
+        lives.value += 1
+        makeRow(level.value)
+        resetBall()
+        row.clear()
+        makeRow(level.value)
+    if(level.value == 5):
+        level.value = 1
+        ball.dxabs += 2
+        ball.dyabs += 2
+        row.clear()
+        makeRow(level.value)
 # makes a row of bricks
 def makeRow(level):
     for x in range(7):
@@ -51,7 +62,6 @@ def onStep():
 # moves the ball according to defined speed
     ball.centerX += ball.dx
     ball.centerY += ball.dy
-    bar.centerX = ball.centerX
 # bounces ball when it hits left, top, and right sides
     if(ball.hitsShape(bottom)):
         resetBall()
@@ -83,12 +93,14 @@ def onStep():
     if(level.value == 5):
         gameEnd('win')
 # moves the bar according to mouse position
-#def onMouseMove(mouseX,mouseY):
-   # bar.centerX = mouseX
-
+def onMouseMove(mouseX,mouseY):
+    bar.centerX = mouseX
+# pauses game
 def onKeyPress(key):
     if(key == 'space'):
         if(app.paused):
             app.paused = False
         else:
             app.paused = True
+    elif(key == 'g'):
+        nextLevel()
